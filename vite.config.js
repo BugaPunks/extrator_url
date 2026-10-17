@@ -5,14 +5,14 @@ import { resolve } from 'path';
 export default defineConfig({
     plugins: [vue()],
     base: '/static/',
-    root: resolve(__dirname, 'resources'),
+    root: resolve(import.meta.dirname, 'resources'),
     build: {
-        outDir: resolve(__dirname, 'static'),
+        outDir: resolve(import.meta.dirname, 'static'),
         emptyOutDir: true,
         manifest: true,
         rollupOptions: {
             input: {
-                app: resolve(__dirname, 'resources/js/app.js'),
+                app: resolve(import.meta.dirname, 'resources/js/app.js'),
             },
         },
     },

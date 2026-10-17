@@ -118,28 +118,28 @@ const getFilenameFromResponse = (response) => {
 </script>
 
 <template>
-    <div class="container">
-        <div class="card">
-            <h1 class="h1">Extractor de URLs de YouTube</h1>
-            <p>Ingresa la URL o handle de un canal de YouTube para extraer todas las URLs de sus videos.</p>
+    <div class="mx-auto max-w-6xl p-4 sm:p-8">
+        <div class="mb-6 rounded-lg bg-white p-6 shadow-md">
+            <h1 class="mb-4 text-3xl font-bold text-slate-900">Extractor de URLs de YouTube</h1>
+            <p class="text-slate-600">Ingresa la URL o handle de un canal de YouTube para extraer todas las URLs de sus videos.</p>
         </div>
 
-        <div class="card">
+        <div class="mb-6 rounded-lg bg-white p-6 shadow-md">
             <form @submit.prevent="extraerUrls">
-                <div class="flex-col">
+                <div class="flex flex-col gap-4">
                     <InputChannel v-model="canal" :disabled="loading" />
                     
-                    <div class="checkbox-label">
-                        <input type="checkbox" id="incluirTitulos" class="checkbox" v-model="incluirTitulos" :disabled="loading" />
-                        <label for="incluirTitulos">Incluir títulos de videos</label>
+                    <div class="flex items-center gap-2 text-sm text-slate-900">
+                        <input type="checkbox" id="incluirTitulos" class="h-[18px] w-[18px] accent-blue-500" v-model="incluirTitulos" :disabled="loading" />
+                        <label for="incluirTitulos" class="cursor-pointer">Incluir títulos de videos</label>
                     </div>
 
                     <div>
-                        <label class="label" for="maxUrls">Máx. URLs por archivo (0 = archivo único)</label>
+                        <label class="mb-2 block text-sm font-medium text-slate-900" for="maxUrls">Máx. URLs por archivo (0 = archivo único)</label>
                         <input 
                             type="number" 
                             id="maxUrls" 
-                            class="input" 
+                            class="w-full rounded-md border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/20 disabled:cursor-not-allowed disabled:opacity-60" 
                             v-model.number="maxUrlsPorArchivo" 
                             min="0" 
                             :disabled="loading"
@@ -148,7 +148,7 @@ const getFilenameFromResponse = (response) => {
 
                     <button 
                         type="submit" 
-                        class="btn btn-primary" 
+                        class="inline-flex w-full items-center justify-center gap-2 rounded-md bg-blue-500 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto" 
                         :disabled="loading || !canal"
                     >
                         <span v-if="!loading">Extraer URLs</span>
@@ -158,24 +158,24 @@ const getFilenameFromResponse = (response) => {
             </form>
         </div>
 
-        <div v-if="loading" class="card">
-            <div style="display: flex; align-items: center; gap: 1rem;">
+        <div v-if="loading" class="mb-6 rounded-lg bg-white p-6 shadow-md">
+            <div class="flex items-center gap-4">
                 <LoadingSpinner />
-                <p class="loading-message">
+                <p class="text-sm text-slate-900">
                     <span>Obteniendo lista de videos...</span>
                 </p>
             </div>
         </div>
 
-        <div v-if="error" class="card">
-            <p class="error-message">{{ error }}</p>
+        <div v-if="error" class="mb-6 rounded-lg bg-white p-6 shadow-md">
+            <p class="rounded-md border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-600">{{ error }}</p>
         </div>
 
-        <div v-if="successMessage" class="card">
-            <p class="success-message">{{ successMessage }}</p>
+        <div v-if="successMessage" class="mb-6 rounded-lg bg-white p-6 shadow-md">
+            <p class="rounded-md border border-green-500/30 bg-green-500/10 p-3 text-sm text-green-600">{{ successMessage }}</p>
         </div>
 
-        <div v-if="results && results.length > 0" class="card">
+        <div v-if="results && results.length > 0" class="mb-6 rounded-lg bg-white p-6 shadow-md">
             <ResultsArea :results="results" :incluir-titulos="incluirTitulos" />
             <div class="mt-4">
                 <ExportButtons 

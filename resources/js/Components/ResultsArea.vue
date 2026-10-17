@@ -19,15 +19,11 @@ const formattedResults = () => {
 
 <template>
     <div>
-        <label class="label">Resultados ({{ results.length }} URLs)</label>
-        <textarea 
-            class="textarea" 
-            readonly 
+        <label class="mb-2 block text-sm font-medium text-slate-900">Resultados ({{ results.length }} URLs)</label>
+        <textarea
+            class="min-h-[200px] w-full rounded-md border border-slate-200 bg-slate-100 p-3 text-sm text-slate-900 transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/20"
+            readonly
             :value="formattedResults()"
         ></textarea>
     </div>
 </template>
-
-<style scoped>
-/* Estilos especificos del componente */
-</style>

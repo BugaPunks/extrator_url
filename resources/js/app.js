@@ -1,6 +1,6 @@
 import { createApp, h } from 'vue';
 import { createInertiaApp } from '@inertiajs/vue3';
-import '../sass/app.scss';
+import '../css/app.css';
 
 const pages = {
     Extractor: () => import('./Pages/Extractor.vue'),

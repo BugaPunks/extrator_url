@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+/* Tailwind v4: indica dónde buscar las clases usadas (componentes Vue) */
+@source "../js";
+
+@layer base {
+    body {
+        @apply min-h-screen bg-slate-100 text-slate-900 antialiased;
+    }
+}
