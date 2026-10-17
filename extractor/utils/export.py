@@ -3,12 +3,16 @@ Utilidades para exportacion de URLs a archivos .txt
 """
 import os
 import zipfile
-import tempfile
-from io import BytesIO
+from io import BytesIO, StringIO
+from typing import List, Tuple
 from django.http import FileResponse
 
 
-def generar_archivo_txt(urls, incluir_titulos=False, max_urls_por_archivo=0):
+def generar_archivo_txt(
+    urls: List[Tuple[str, str]], 
+    incluir_titulos: bool = False, 
+    max_urls_por_archivo: int = 0
+) -> List[Tuple[str, str]]:
     """
     Genera archivo(s) .txt con las URLs.
     
@@ -18,9 +22,19 @@ def generar_archivo_txt(urls, incluir_titulos=False, max_urls_por_archivo=0):
         max_urls_por_archivo: Maximo de URLs por archivo (0 = archivo unico)
         
     Returns:
-        Si max_urls_por_archivo == 0: (contenido, nombre_archivo)
-        Si max_urls_por_archivo > 0: lista de (contenido, nombre_archivo)
+        Lista de tuplas (contenido, nombre_archivo)
+        
+    Examples:
+        >>> urls = [('Video 1', 'https://youtube.com/watch?v=abc'), ('Video 2', 'https://youtube.com/watch?v=def')]
+        >>> generar_archivo_txt(urls, False, 0)
+        [('https://youtube.com/watch?v=abc\\nhttps://youtube.com/watch?v=def', 'urls_videos.txt')]
+        >>> generar_archivo_txt(urls, True, 1)
+        [('Video 1 - https://youtube.com/watch?v=abc', 'urls_videos_parte_1.txt'), 
+         ('Video 2 - https://youtube.com/watch?v=def', 'urls_videos_parte_2.txt')]
     """
+    if not urls:
+        return []
+    
     if max_urls_por_archivo <= 0:
         # Archivo unico
         contenido = []
@@ -55,7 +69,7 @@ def generar_archivo_txt(urls, incluir_titulos=False, max_urls_por_archivo=0):
                 urls_actuales = []
                 parte += 1
         
-        # Ultima parte
+        # Ultima parte (puede tener menos URLs)
         if urls_actuales:
             contenido = []
             for t, u in urls_actuales:
@@ -71,7 +85,7 @@ def generar_archivo_txt(urls, incluir_titulos=False, max_urls_por_archivo=0):
         return archivos
 
 
-def crear_zip_con_archivos(archivos):
+def crear_zip_con_archivos(archivos: List[Tuple[str, str]]) -> BytesIO:
     """
     Crea un archivo ZIP con los archivos dados.
     
@@ -80,18 +94,33 @@ def crear_zip_con_archivos(archivos):
         
     Returns:
         BytesIO con el contenido del ZIP
+        
+    Raises:
+        ValueError: Si la lista de archivos esta vacia
     """
+    if not archivos:
+        raise ValueError("No hay archivos para comprimir")
+    
     zip_buffer = BytesIO()
     
     with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zipf:
         for contenido, nombre_archivo in archivos:
-            zipf.writestr(nombre_archivo, contenido)
+            # Asegurar que el contenido sea string
+            if isinstance(contenido, str):
+                zipf.writestr(nombre_archivo, contenido)
+            else:
+                zipf.writestr(nombre_archivo, str(contenido))
     
     zip_buffer.seek(0)
     return zip_buffer
 
 
-def generar_response_descarga(urls, incluir_titulos=False, max_urls_por_archivo=0, dividido=False):
+def generar_response_descarga(
+    urls: List[Tuple[str, str]], 
+    incluir_titulos: bool = False,
+    max_urls_por_archivo: int = 0,
+    dividido: bool = False
+) -> FileResponse:
     """
     Genera una FileResponse para descargar los archivos.
     
@@ -103,7 +132,13 @@ def generar_response_descarga(urls, incluir_titulos=False, max_urls_por_archivo=
         
     Returns:
         FileResponse con el archivo o ZIP
+        
+    Raises:
+        ValueError: Si no hay URLs para exportar
     """
+    if not urls:
+        raise ValueError("No hay URLs para exportar")
+    
     if dividido and max_urls_por_archivo > 0:
         archivos = generar_archivo_txt(urls, incluir_titulos, max_urls_por_archivo)
         
@@ -112,7 +147,8 @@ def generar_response_descarga(urls, incluir_titulos=False, max_urls_por_archivo=
             return FileResponse(
                 zip_buffer,
                 as_attachment=True,
-                filename="urls_videos_divididos.zip"
+                filename="urls_videos_divididos.zip",
+                content_type="application/zip"
             )
         else:
             # Solo un archivo, devolver .txt
@@ -120,7 +156,8 @@ def generar_response_descarga(urls, incluir_titulos=False, max_urls_por_archivo=
             return FileResponse(
                 BytesIO(contenido.encode('utf-8')),
                 as_attachment=True,
-                filename=nombre
+                filename=nombre,
+                content_type="text/plain; charset=utf-8"
             )
     else:
         # Archivo unico
@@ -129,5 +166,6 @@ def generar_response_descarga(urls, incluir_titulos=False, max_urls_por_archivo=
         return FileResponse(
             BytesIO(contenido.encode('utf-8')),
             as_attachment=True,
-            filename=nombre
+            filename=nombre,
+            content_type="text/plain; charset=utf-8"
         )

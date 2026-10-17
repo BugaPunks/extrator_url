@@ -18,13 +18,25 @@ from extractor.utils.export import generar_archivo_txt
 
 
 def main():
+    """
+    CLI para extraer URLs de videos de YouTube.
+    
+    Uso:
+        python main.py [canal] [archivo_salida]
+        
+    Argumentos:
+        canal: URL o handle del canal (ej: @midudev, https://www.youtube.com/@midudev)
+        archivo_salida: Nombre del archivo .txt de salida (opcional, por defecto: urls_videos.txt)
+    """
     print("=" * 45)
     print("   EXTRACTOR DE URLs DE VIDEOS DE YOUTUBE   ")
     print("=" * 45)
 
+    # Parsear argumentos de linea de comandos
     if len(sys.argv) > 1:
         canal = sys.argv[1]
         archivo = sys.argv[2] if len(sys.argv) > 2 else "urls_videos.txt"
+        incluir_titulos = len(sys.argv) > 3 and sys.argv[3].lower() in ('--titulos', '-t', 's', 'si', 'yes')
     else:
         canal = input("\nIngresa la URL o handle del canal (ej: @midudev o URL completa): ").strip()
         if not canal:
@@ -33,13 +45,14 @@ def main():
         archivo = input("Nombre del archivo .txt (Enter para 'urls_videos.txt'): ").strip()
         if not archivo:
             archivo = "urls_videos.txt"
+        incluir_titulos = input("¿Incluir títulos de videos? (s/n, Enter para no): ").strip().lower() == 's'
 
     if not archivo.endswith(".txt"):
         archivo += ".txt"
 
-    incluir_titulos = input("¿Incluir títulos de videos? (s/n, Enter para no): ").strip().lower() == 's'
-    
-    print(f"\n[+] URL procesada: {normalizar_url_canal(canal)}")
+    # Mostrar informacion de procesamiento
+    url_normalizada = normalizar_url_canal(canal)
+    print(f"\n[+] URL procesada: {url_normalizada}")
     print("[+] Obteniendo lista de videos (esto puede demorar unos momentos)...")
 
     # Extraer URLs usando el servicio

@@ -1,48 +1,64 @@
 <script setup>
 import { ref } from 'vue';
-import { router, usePage } from '@inertiajs/vue3';
 import InputChannel from '../Components/InputChannel.vue';
 import ResultsArea from '../Components/ResultsArea.vue';
 import ExportButtons from '../Components/ExportButtons.vue';
 import LoadingSpinner from '../Components/LoadingSpinner.vue';
 
-const page = usePage();
-
-const canal = ref(page.props.canal || '');
-const incluirTitulos = ref(page.props.incluir_titulos || false);
-const maxUrlsPorArchivo = ref(page.props.max_urls_por_archivo || 0);
+const canal = ref('');
+const incluirTitulos = ref(false);
+const maxUrlsPorArchivo = ref(0);
 const loading = ref(false);
-const results = ref(page.props.results || []);
-const error = ref(page.props.error || null);
-const successMessage = ref(page.props.success_message || null);
+const results = ref([]);
+const error = ref(null);
+const successMessage = ref(null);
 
-const extraerUrls = () => {
+// Obtener CSRF token de la meta tag
+const getCsrfToken = () => {
+    const metaTag = document.querySelector('meta[name="csrf-token"]');
+    return metaTag ? metaTag.getAttribute('content') : '';
+};
+
+const extraerUrls = async () => {
     error.value = null;
     successMessage.value = null;
     loading.value = true;
     results.value = [];
 
-    router.post('/extraer', {
-        canal: canal.value,
-        incluir_titulos: incluirTitulos.value,
-    }, {
-        preserveScroll: true,
-        onSuccess: (response) => {
-            loading.value = false;
-            if (response.props.error) {
-                error.value = response.props.error;
+    try {
+        const response = await fetch('/extraer', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken(),
+            },
+            body: JSON.stringify({
+                canal: canal.value,
+                incluir_titulos: incluirTitulos.value,
+                max_urls_por_archivo: maxUrlsPorArchivo.value,
+            }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            error.value = data.error || 'Error al extraer URLs';
+            results.value = [];
+        } else {
+            if (data.error) {
+                error.value = data.error;
+                results.value = [];
             } else {
-                results.value = response.props.results || [];
-                if (response.props.success_message) {
-                    successMessage.value = response.props.success_message;
-                }
+                results.value = data.results || [];
+                successMessage.value = data.success_message || 'Extracción completada';
             }
-        },
-        onError: (errors) => {
-            loading.value = false;
-            error.value = errors.message || 'Error al extraer URLs';
-        },
-    });
+        }
+    } catch (err) {
+        error.value = 'Error de red: ' + err.message;
+        results.value = [];
+    } finally {
+        loading.value = false;
+    }
 };
 
 const exportar = (dividido = false) => {
@@ -51,18 +67,14 @@ const exportar = (dividido = false) => {
         return;
     }
 
-    const formData = new FormData();
-    formData.append('results', JSON.stringify(results.value));
-    formData.append('incluir_titulos', incluirTitulos.value);
-    formData.append('max_urls_por_archivo', maxUrlsPorArchivo.value);
-    formData.append('dividido', dividido);
-
-    window.location.href = '/exportar?' + new URLSearchParams({
+    const params = new URLSearchParams({
         results: JSON.stringify(results.value),
         incluir_titulos: incluirTitulos.value,
         max_urls_por_archivo: maxUrlsPorArchivo.value,
         dividido: dividido,
-    }).toString();
+    });
+
+    window.location.href = '/exportar?' + params.toString();
 };
 </script>
 
@@ -108,10 +120,12 @@ const exportar = (dividido = false) => {
         </div>
 
         <div v-if="loading" class="card">
-            <LoadingSpinner />
-            <p class="loading-message">
-                <span>Obteniendo lista de videos...</span>
-            </p>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <LoadingSpinner />
+                <p class="loading-message">
+                    <span>Obteniendo lista de videos...</span>
+                </p>
+            </div>
         </div>
 
         <div v-if="error" class="card">
