@@ -1,8 +1,8 @@
 import os
 import sys
-import yt_dlp
+import json
 
-# Asegurar codificación UTF-8 en consola de Windows
+# Asegurar codificacion UTF-8 en consola de Windows
 if sys.platform == "win32":
     try:
         sys.stdout.reconfigure(encoding="utf-8")
@@ -10,90 +10,14 @@ if sys.platform == "win32":
     except Exception:
         pass
 
-def normalizar_url_canal(canal_input: str) -> str:
-    """
-    Normaliza la entrada del usuario para asegurar un formato válido de YouTube
-    apuntando a la sección de videos.
-    """
-    url = canal_input.strip().rstrip('/')
-    
-    # Si ingresaron solo el handle (ej: @midudev o midudev)
-    if url.startswith('@'):
-        url = f"https://www.youtube.com/{url}"
-    elif not url.startswith('http://') and not url.startswith('https://'):
-        if 'youtube.com' in url:
-            url = f"https://{url}"
-        else:
-            url = f"https://www.youtube.com/@{url}"
+# Agregar el directorio del proyecto al path para importar el servicio
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-    # Si no especifica una pestaña (/videos, /shorts, /streams, etc.), agregamos /videos
-    pestanas = ('/videos', '/shorts', '/streams', '/playlists', '/featured')
-    if not any(url.endswith(p) for p in pestanas):
-        url = f"{url}/videos"
-        
-    return url
+from extractor.services.youtube import normalizar_url_canal, extraer_urls_canal
+from extractor.utils.export import generar_archivo_txt
 
-def extraer_urls_canal(channel_url: str, archivo_salida: str = "urls_videos.txt", incluir_titulos: bool = False):
-    canal_url_procesada = normalizar_url_canal(channel_url)
-    
-    print(f"\n[+] URL procesada: {canal_url_procesada}")
-    print("[+] Obteniendo lista de videos (esto puede demorar unos momentos)...")
 
-    ydl_opts = {
-        'extract_flat': True,       # Extrae la lista rápidamente sin descargar contenido
-        'quiet': True,
-        'no_warnings': True,
-        'ignoreerrors': True,       # Si algún video fue borrado o es privado, continúa
-    }
-
-    urls_encontradas = []
-
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        try:
-            info = ydl.extract_info(canal_url_procesada, download=False)
-        except Exception as e:
-            print(f"\n[!] Error al acceder al canal: {e}")
-            return []
-
-        if not info:
-            print("\n[!] No se pudo obtener información del canal.")
-            return []
-
-        nombre_canal = info.get('channel') or info.get('uploader') or info.get('title') or "Canal"
-        print(f"[OK] Canal detectado: {nombre_canal}")
-
-        entries = info.get('entries', [])
-        for entry in entries:
-            if not entry:
-                continue
-            
-            video_id = entry.get('id')
-            video_url = entry.get('url') or (f"https://www.youtube.com/watch?v={video_id}" if video_id else None)
-            titulo = entry.get('title') or 'Sin título'
-
-            if video_url:
-                if not video_url.startswith('http'):
-                    video_url = f"https://www.youtube.com/watch?v={video_url}"
-                urls_encontradas.append((titulo, video_url))
-
-    if not urls_encontradas:
-        print("\n[!] No se encontraron videos. Asegúrate de que el canal tenga videos públicos.")
-        return []
-
-    ruta_salida = os.path.abspath(archivo_salida)
-    with open(ruta_salida, 'w', encoding='utf-8') as f:
-        for titulo, url in urls_encontradas:
-            if incluir_titulos:
-                f.write(f"{titulo} - {url}\n")
-            else:
-                f.write(f"{url}\n")
-
-    print(f"\n[OK] ¡Completado con éxito!")
-    print(f"[OK] Total de videos extraídos: {len(urls_encontradas)}")
-    print(f"[OK] Archivo guardado en: {ruta_salida}\n")
-    return urls_encontradas
-
-if __name__ == "__main__":
+def main():
     print("=" * 45)
     print("   EXTRACTOR DE URLs DE VIDEOS DE YOUTUBE   ")
     print("=" * 45)
@@ -113,4 +37,34 @@ if __name__ == "__main__":
     if not archivo.endswith(".txt"):
         archivo += ".txt"
 
-    extraer_urls_canal(canal, archivo)
+    incluir_titulos = input("¿Incluir títulos de videos? (s/n, Enter para no): ").strip().lower() == 's'
+    
+    print(f"\n[+] URL procesada: {normalizar_url_canal(canal)}")
+    print("[+] Obteniendo lista de videos (esto puede demorar unos momentos)...")
+
+    # Extraer URLs usando el servicio
+    urls, error = extraer_urls_canal(canal, incluir_titulos)
+    
+    if error:
+        print(f"\n[!] Error: {error}")
+        sys.exit(1)
+    
+    if not urls:
+        print("\n[!] No se encontraron videos.")
+        sys.exit(1)
+
+    # Generar archivo
+    archivos = generar_archivo_txt(urls, incluir_titulos, 0)  # 0 = archivo unico
+    contenido, nombre_archivo = archivos[0]
+    
+    ruta_salida = os.path.abspath(archivo)
+    with open(ruta_salida, 'w', encoding='utf-8') as f:
+        f.write(contenido)
+
+    print(f"\n[OK] ¡Completado con éxito!")
+    print(f"[OK] Total de videos extraídos: {len(urls)}")
+    print(f"[OK] Archivo guardado en: {ruta_salida}\n")
+
+
+if __name__ == "__main__":
+    main()
