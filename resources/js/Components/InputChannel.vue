@@ -35,3 +35,7 @@ const updateValue = (event) => {
         </p>
     </div>
 </template>
+
+<style scoped>
+/* Estilos especificos del componente */
+</style>

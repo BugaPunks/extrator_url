@@ -27,3 +27,7 @@ const formattedResults = () => {
         ></textarea>
     </div>
 </template>
+
+<style scoped>
+/* Estilos especificos del componente */
+</style>

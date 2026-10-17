@@ -37,3 +37,7 @@ const showDivided = () => {
         </button>
     </div>
 </template>
+
+<style scoped>
+/* Estilos especificos del componente */
+</style>
