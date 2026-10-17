@@ -7,7 +7,7 @@ Convertir el script CLI actual (`main.py`) en una aplicación web usando Django 
 
 ### 1. Interfaz de Usuario
 - **Pantalla principal**: Formulario con:
-  - Textbox/Input para URL o handle del canal de YouTube (ej: `@midudev`, `https://www.youtube.com/@midudev`)
+  - Textbox/Input para URL o handle del canal de YouTube (ej: `@tucanal`, `https://www.youtube.com/@tucanal`)
   - Checkbox: "Incluir títulos de videos" (desmarcado por defecto)
   - Input numérico: "Máx. URLs por archivo" (opcional, para dividir en múltiples .txt)
   - Botón: "Extraer URLs"

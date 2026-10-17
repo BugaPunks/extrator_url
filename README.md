@@ -19,7 +19,7 @@ Simplemente ejecuta el script:
 python main.py
 ```
 Te pedirá:
-1. La URL o identificador del canal (por ejemplo: `@midudev`, `midudev`, o `https://www.youtube.com/@midudev`).
+1. La URL o identificador del canal (por ejemplo: `@tucanal`, `tucanal`, o `https://www.youtube.com/@tucanal`).
 2. El nombre del archivo `.txt` donde se guardarán (por defecto: `urls_videos.txt`).
 
 ---

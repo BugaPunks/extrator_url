@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_inertia',
+    'inertia',
     'extractor',
 ]
 
@@ -49,7 +49,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django_inertia.middleware.InertiaMiddleware',
+    'inertia.middleware.InertiaMiddleware',
 ]
 
 ROOT_URLCONF = 'extractor_project.urls'
@@ -70,11 +70,9 @@ TEMPLATES = [
     },
 ]
 
-INERTIA = {
-    'TEMPLATE': 'inertia.html',
-    'VERSION': None,
-    'ROOT_VIEW': 'app.html',
-}
+# django-inertia (paquete `inertia-django`).
+# INERTIA_LAYOUT es la plantilla base que define el bloque {% block inertia %}.
+INERTIA_LAYOUT = 'app.html'
 
 WSGI_APPLICATION = 'extractor_project.wsgi.application'
 
@@ -88,6 +86,10 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# La app no persiste datos: las sesiones van en cookie firmada para
+# no depender de una base de datos.
+SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 
 
 # Password validation
@@ -124,7 +126,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/ref/settings/#static-files
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+# Salida del build de Vite (assets con hash + manifest).
+STATICFILES_DIRS = [BASE_DIR / 'static']
+# Destino de `collectstatic` en producción.
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Default primary key field type

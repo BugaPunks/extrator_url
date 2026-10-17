@@ -22,16 +22,16 @@ def normalizar_url_canal(canal_input: str) -> str:
         URL normalizada del canal con la pestana /videos
         
     Examples:
-        >>> normalizar_url_canal("@midudev")
-        'https://www.youtube.com/@midudev/videos'
-        >>> normalizar_url_canal("midudev")
-        'https://www.youtube.com/@midudev/videos'
-        >>> normalizar_url_canal("https://www.youtube.com/@midudev")
-        'https://www.youtube.com/@midudev/videos'
+        >>> normalizar_url_canal("@tucanal")
+        'https://www.youtube.com/@tucanal/videos'
+        >>> normalizar_url_canal("tucanal")
+        'https://www.youtube.com/@tucanal/videos'
+        >>> normalizar_url_canal("https://www.youtube.com/@tucanal")
+        'https://www.youtube.com/@tucanal/videos'
     """
     url = canal_input.strip().rstrip('/')
     
-    # Si ingresaron solo el handle (ej: @midudev o midudev)
+    # Si ingresaron solo el handle (ej: @tucanal o tucanal)
     if url.startswith('@'):
         url = f"https://www.youtube.com/{url}"
     elif not url.startswith('http://') and not url.startswith('https://'):
@@ -77,8 +77,6 @@ def extraer_urls_canal(channel_url: str, incluir_titulos: bool = False, max_urls
         'quiet': True,
         'no_warnings': False,  # Queremos ver warnings para depuracion
         'ignoreerrors': True,  # Continuar si hay errores en videos individuales
-        'force_generic_extractor': True,  # Usar extractor generico para mayor compatibilidad
-        'default_search': 'ytsearch',  # Si no es un canal, intentar busqueda
     }
 
     urls_encontradas = []

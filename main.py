@@ -25,7 +25,7 @@ def main():
         python main.py [canal] [archivo_salida]
         
     Argumentos:
-        canal: URL o handle del canal (ej: @midudev, https://www.youtube.com/@midudev)
+        canal: URL o handle del canal (ej: @tucanal, https://www.youtube.com/@tucanal)
         archivo_salida: Nombre del archivo .txt de salida (opcional, por defecto: urls_videos.txt)
     """
     print("=" * 45)
@@ -38,7 +38,7 @@ def main():
         archivo = sys.argv[2] if len(sys.argv) > 2 else "urls_videos.txt"
         incluir_titulos = len(sys.argv) > 3 and sys.argv[3].lower() in ('--titulos', '-t', 's', 'si', 'yes')
     else:
-        canal = input("\nIngresa la URL o handle del canal (ej: @midudev o URL completa): ").strip()
+        canal = input("\nIngresa la URL o handle del canal (ej: @tucanal o URL completa): ").strip()
         if not canal:
             print("[!] No se ingresó ningún canal.")
             sys.exit(1)

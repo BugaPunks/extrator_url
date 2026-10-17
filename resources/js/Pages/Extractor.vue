@@ -35,7 +35,6 @@ const extraerUrls = async () => {
             body: JSON.stringify({
                 canal: canal.value,
                 incluir_titulos: incluirTitulos.value,
-                max_urls_por_archivo: maxUrlsPorArchivo.value,
             }),
         });
 
@@ -61,20 +60,60 @@ const extraerUrls = async () => {
     }
 };
 
-const exportar = (dividido = false) => {
+const exportar = async (dividido = false) => {
     if (!results.value || results.value.length === 0) {
         error.value = 'No hay URLs para exportar';
         return;
     }
 
-    const params = new URLSearchParams({
-        results: JSON.stringify(results.value),
-        incluir_titulos: incluirTitulos.value,
-        max_urls_por_archivo: maxUrlsPorArchivo.value,
-        dividido: dividido,
-    });
+    error.value = null;
 
-    window.location.href = '/exportar?' + params.toString();
+    try {
+        const response = await fetch('/exportar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken(),
+            },
+            body: JSON.stringify({
+                results: results.value,
+                incluir_titulos: incluirTitulos.value,
+                max_urls_por_archivo: maxUrlsPorArchivo.value,
+                dividido: dividido,
+            }),
+        });
+
+        if (!response.ok) {
+            let mensaje = 'Error al exportar';
+            try {
+                const data = await response.json();
+                mensaje = data.error || mensaje;
+            } catch (e) {
+                // respuesta sin JSON
+            }
+            error.value = mensaje;
+            return;
+        }
+
+        const filename = getFilenameFromResponse(response);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+    } catch (err) {
+        error.value = 'Error de red: ' + err.message;
+    }
+};
+
+const getFilenameFromResponse = (response) => {
+    const disposition = response.headers.get('Content-Disposition') || '';
+    const match = /filename\*?=(?:UTF-8'')?"?([^";]+)"?/i.exec(disposition);
+    return match ? decodeURIComponent(match[1]) : 'urls_videos.txt';
 };
 </script>
 

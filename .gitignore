@@ -6,3 +6,17 @@ node_modules
 
 .kilo
 .opencode
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Base de datos local
+db.sqlite3
+
+# Assets generados por Vite / collectstatic
+static/
+staticfiles/
+
+# Restos de instalaciones mal escritas (pip install X>=1 en PowerShell)
+=*

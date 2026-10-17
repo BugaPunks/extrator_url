@@ -24,14 +24,14 @@ const updateValue = (event) => {
             type="text" 
             id="canal" 
             class="input" 
-            placeholder="Ej: @midudev, https://www.youtube.com/@midudev o midudev"
+            placeholder="Ej: @tucanal, https://www.youtube.com/@tucanal o tucanal"
             :value="modelValue"
             @input="updateValue"
             :disabled="disabled"
             required
         />
         <p class="mt-2" style="font-size: 0.75rem; color: #64748b;">
-            Ejemplos: @midudev, https://www.youtube.com/@midudev/videos, midudev
+            Ejemplos: @tucanal, https://www.youtube.com/@tucanal/videos, tucanal
         </p>
     </div>
 </template>

@@ -4,10 +4,12 @@ import { resolve } from 'path';
 
 export default defineConfig({
     plugins: [vue()],
+    base: '/static/',
     root: resolve(__dirname, 'resources'),
     build: {
-        outDir: resolve(__dirname, 'staticfiles'),
+        outDir: resolve(__dirname, 'static'),
         emptyOutDir: true,
+        manifest: true,
         rollupOptions: {
             input: {
                 app: resolve(__dirname, 'resources/js/app.js'),

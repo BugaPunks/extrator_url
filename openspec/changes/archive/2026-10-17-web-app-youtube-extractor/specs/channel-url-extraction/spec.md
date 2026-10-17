@@ -1,14 +1,14 @@
 ## ADDED Requirements
 
 ### Requirement: Extract video list from a YouTube channel
-The system SHALL accept a YouTube channel URL or handle (e.g. `@midudev`, `https://www.youtube.com/@midudev`) and return the flat list of videos of that channel using `yt-dlp` with `extract_flat: True`.
+The system SHALL accept a YouTube channel URL or handle (e.g. `@tucanal`, `https://www.youtube.com/@tucanal`) and return the flat list of videos of that channel using `yt-dlp` with `extract_flat: True`.
 
 #### Scenario: Extraction by handle
-- **WHEN** the user submits `@midudev` as the channel
-- **THEN** the system normalizes it to `https://www.youtube.com/@midudev/videos` and returns the list of videos of the channel
+- **WHEN** the user submits `@tucanal` as the channel
+- **THEN** the system normalizes it to `https://www.youtube.com/@tucanal/videos` and returns the list of videos of the channel
 
 #### Scenario: Extraction by full URL
-- **WHEN** the user submits `https://www.youtube.com/@midudev`
+- **WHEN** the user submits `https://www.youtube.com/@tucanal`
 - **THEN** the system appends `/videos` if missing and returns the list of videos of the channel
 
 ### Requirement: Include titles option
