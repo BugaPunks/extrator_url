@@ -73,7 +73,7 @@ TEMPLATES = [
 INERTIA = {
     'TEMPLATE': 'inertia.html',
     'VERSION': None,
-    'ROOT_VIEW': 'inertia.html',
+    'ROOT_VIEW': 'app.html',
 }
 
 WSGI_APPLICATION = 'extractor_project.wsgi.application'
@@ -122,7 +122,7 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
+# https://docs.djangoproject.com/en/4.2/ref/settings/#static-files
 
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'

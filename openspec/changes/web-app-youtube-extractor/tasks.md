@@ -30,4 +30,4 @@
 - [x] 5.1 Probar extracción con varios canales (handle, URL completa, canal grande, canal inválido)
 - [x] 5.2 Probar exportación: archivo único, divididos (última parte con menos URLs), con y sin títulos
 - [x] 5.3 Probar manejo de errores end-to-end: canal inexistente, videos privados/borrados, error de red
-- [ ] 5.4 Verificar build de producción de Vite y carga de assets desde Django, y que el CLI original sigue operativo
+- [x] 5.4 Verificar build de producción de Vite y carga de assets desde Django, y que el CLI original sigue operativo
